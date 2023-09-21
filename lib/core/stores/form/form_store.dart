@@ -14,13 +14,13 @@ abstract class _FormStore with Store {
   final ErrorStore errorStore;
 
   _FormStore(this.formErrorStore, this.errorStore) {
-    _setupValidations();
+    setupValidations();
   }
 
   // disposers:-----------------------------------------------------------------
   late List<ReactionDisposer> _disposers;
 
-  void _setupValidations() {
+  void setupValidations() {
     _disposers = [
       reaction((_) => userEmail, validateUserEmail),
       reaction((_) => password, validatePassword),
@@ -30,10 +30,10 @@ abstract class _FormStore with Store {
 
   // store variables:-----------------------------------------------------------
   @observable
-  String userEmail = '';
+  String userEmail = "toandn96@gmail.com";
 
   @observable
-  String password = '';
+  String password = 'Dnt@2605';
 
   @observable
   String confirmPassword = '';
@@ -43,7 +43,9 @@ abstract class _FormStore with Store {
 
   @computed
   bool get canLogin =>
-      !formErrorStore.hasErrorsInLogin && userEmail.isNotEmpty && password.isNotEmpty;
+      !formErrorStore.hasErrorsInLogin &&
+      userEmail.isNotEmpty &&
+      password.isNotEmpty;
 
   @computed
   bool get canRegister =>
@@ -139,4 +141,10 @@ abstract class _FormErrorStore with Store {
 
   @computed
   bool get hasErrorInForgotPassword => userEmail != null;
+}
+
+class LoginDefaultValues {
+  String? userEmail;
+
+  String? password;
 }

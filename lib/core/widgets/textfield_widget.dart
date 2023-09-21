@@ -16,6 +16,7 @@ class TextFieldWidget extends StatelessWidget {
   final ValueChanged? onChanged;
   final bool autoFocus;
   final TextInputAction? inputAction;
+  final String? initialValue;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +24,7 @@ class TextFieldWidget extends StatelessWidget {
       padding: padding,
       child: TextFormField(
         controller: textController,
+        initialValue: initialValue, // Initial value for text form
         focusNode: focusNode,
         onFieldSubmitted: onFieldSubmitted,
         onChanged: onChanged,
@@ -34,8 +36,10 @@ class TextFieldWidget extends StatelessWidget {
         style: Theme.of(context).textTheme.bodyLarge,
         decoration: InputDecoration(
             hintText: this.hint,
-            hintStyle:
-                Theme.of(context).textTheme.bodyLarge!.copyWith(color: hintColor),
+            hintStyle: Theme.of(context)
+                .textTheme
+                .bodyLarge!
+                .copyWith(color: hintColor),
             errorText: errorText,
             counterText: '',
             icon: this.isIcon ? Icon(this.icon, color: iconColor) : null),
@@ -43,23 +47,23 @@ class TextFieldWidget extends StatelessWidget {
     );
   }
 
-  const TextFieldWidget({
-    Key? key,
-    required this.icon,
-    required this.errorText,
-    required this.textController,
-    this.inputType,
-    this.hint,
-    this.isObscure = false,
-    this.isIcon = true,
-    this.padding = const EdgeInsets.all(0),
-    this.hintColor = Colors.grey,
-    this.iconColor = Colors.grey,
-    this.focusNode,
-    this.onFieldSubmitted,
-    this.onChanged,
-    this.autoFocus = false,
-    this.inputAction,
-  }) : super(key: key);
-
+  const TextFieldWidget(
+      {Key? key,
+      required this.icon,
+      required this.errorText,
+      required this.textController,
+      this.inputType,
+      this.hint,
+      this.isObscure = false,
+      this.isIcon = true,
+      this.padding = const EdgeInsets.all(0),
+      this.hintColor = Colors.grey,
+      this.iconColor = Colors.grey,
+      this.focusNode,
+      this.onFieldSubmitted,
+      this.onChanged,
+      this.autoFocus = false,
+      this.inputAction,
+      this.initialValue})
+      : super(key: key);
 }

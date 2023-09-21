@@ -1,4 +1,5 @@
 {
+  "app_name": "Indicators",
   "login_start": "Below are list of strings for login da ",
   "login_et_user_email": "Brugernavn",
   "login_et_user_password": "Adgangskode",

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:boilerplate/core/data/network/dio/dio_client.dart';
 import 'package:boilerplate/data/network/constants/endpoints.dart';
 import 'package:boilerplate/data/network/rest_client.dart';
+import 'package:boilerplate/domain/entity/post/post.dart';
 import 'package:boilerplate/domain/entity/post/post_list.dart';
 
 class PostApi {
@@ -26,7 +27,18 @@ class PostApi {
     }
   }
 
-/// sample api call with default rest client
+  /// Returns post by id response
+  Future<Post> getPostById(int postId) async {
+    try {
+      final res = await _dioClient.dio.get("${Endpoints.getPosts}/${postId}");
+      return Post.fromMap(res.data);
+    } catch (e) {
+      print(e.toString());
+      throw e;
+    }
+  }
+
+  /// sample api call with default rest client
 //  Future<PostsList> getPosts() {
 //
 //    return _restClient
@@ -34,5 +46,4 @@ class PostApi {
 //        .then((dynamic res) => PostsList.fromJson(res))
 //        .catchError((error) => throw NetworkException(message: error));
 //  }
-
 }

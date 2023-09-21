@@ -1,34 +1,47 @@
 import 'package:another_flushbar/flushbar_helper.dart';
 import 'package:boilerplate/core/widgets/progress_indicator_widget.dart';
 import 'package:boilerplate/di/service_locator.dart';
+import 'package:boilerplate/domain/entity/post/post.dart';
 import 'package:boilerplate/presentation/post/store/post_store.dart';
 import 'package:boilerplate/utils/locale/app_localization.dart';
-import 'package:boilerplate/utils/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
-class PostListScreen extends StatefulWidget {
+class PostDetailScreen extends StatefulWidget {
+  const PostDetailScreen({super.key, required this.post});
+
+  final Post post;
   @override
-  _PostListScreenState createState() => _PostListScreenState();
+  _PostDetailScreenState createState() => _PostDetailScreenState(this.post);
 }
 
-class _PostListScreenState extends State<PostListScreen> {
+class _PostDetailScreenState extends State<PostDetailScreen> {
   //stores:---------------------------------------------------------------------
   final PostStore _postStore = getIt<PostStore>();
+
+  final Post post;
+
+  _PostDetailScreenState(this.post);
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     // check to see if already called api
-    if (!_postStore.loading) {
-      _postStore.getPosts();
+    if (!_postStore.loadingDetail && this.post.id != 0) {
+      _postStore.getPostById(this.post.id);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return _buildBody();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('${this.post.title}'),
+        actions: [],
+      ),
+      body: _buildBody(),
+    );
   }
 
   // body methods:--------------------------------------------------------------
@@ -42,9 +55,10 @@ class _PostListScreenState extends State<PostListScreen> {
   }
 
   Widget _buildMainContent() {
+    print(_postStore.loadingDetail);
     return Observer(
       builder: (context) {
-        return _postStore.loading
+        return _postStore.loadingDetail
             ? CustomProgressIndicatorWidget()
             : Material(child: _buildListView());
       },
@@ -52,43 +66,13 @@ class _PostListScreenState extends State<PostListScreen> {
   }
 
   Widget _buildListView() {
-    return _postStore.postList != null
-        ? ListView.separated(
-            itemCount: _postStore.postList!.posts!.length,
-            separatorBuilder: (context, position) {
-              return Divider();
-            },
-            itemBuilder: (context, position) {
-              return _buildListItem(position);
-            },
-          )
-        : Center(
-            child: Text(
-              AppLocalizations.of(context).translate('home_tv_no_post_found'),
-            ),
-          );
-  }
-
-  Widget _buildListItem(int position) {
-    final post = _postStore.postList?.posts?[position];
-    return ListTile(
-        dense: true,
-        leading: Icon(Icons.cloud_circle),
-        title: Text(
-          '${post?.title}',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          softWrap: false,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        subtitle: Text(
-          '${post?.body}',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          softWrap: false,
-        ),
-        onTap: () => Navigator.of(context)
-            .pushNamed(Routes.detailPost, arguments: post));
+    return Center(
+        child: Padding(
+      padding: EdgeInsets.all(20.0),
+      child: Text(
+          // AppLocalizations.of(context).translate('home_tv_no_post_found'),
+          '${_postStore.post?.body}'),
+    ));
   }
 
   Widget _handleErrorMessage() {

@@ -16,26 +16,81 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  //stores:---------------------------------------------------------------------
+  /**
+   * Define store
+   */
   final ThemeStore _themeStore = getIt<ThemeStore>();
   final LanguageStore _languageStore = getIt<LanguageStore>();
+
+  int _selectedIndex = 0;
+
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  final List<Widget> _widgetOptions = <Widget>[
+    PostListScreen(),
+    Text(
+      'Index 1: Business',
+      style: optionStyle,
+    ),
+    Text(
+      'Index 2: School',
+      style: optionStyle,
+    ),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: PostListScreen(),
+      body: _widgetOptions.elementAt(_selectedIndex),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.business),
+            label: 'Business',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.school),
+            label: 'School',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
+      ),
     );
   }
 
-  // app bar methods:-----------------------------------------------------------
+  /**
+   * App bar
+   */
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      title: Text(AppLocalizations.of(context).translate('home_tv_posts')),
+      title: Text(
+        AppLocalizations.of(context).translate('app_name').toUpperCase(),
+        textAlign: TextAlign.center,
+        style: Theme.of(context)
+            .textTheme
+            .titleLarge
+            ?.copyWith(color: Colors.red[500]),
+      ),
       actions: _buildActions(context),
     );
   }
 
+  /**
+   * Home button actions
+   */
   List<Widget> _buildActions(BuildContext context) {
     return <Widget>[
       _buildLanguageButton(),
@@ -44,6 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
   }
 
+  /** 
+   * Theme button
+   */
   Widget _buildThemeButton() {
     return Observer(
       builder: (context) {
@@ -59,6 +117,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /** 
+   * Logout button
+   */
   Widget _buildLogoutButton() {
     return IconButton(
       onPressed: () {
@@ -73,6 +134,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /** 
+   * Language button
+   */
   Widget _buildLanguageButton() {
     return IconButton(
       onPressed: () {
@@ -84,6 +148,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /** 
+   * Language dialog
+   */
   _buildLanguageDialog() {
     _showDialog<String>(
       context: context,
@@ -132,6 +199,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /**
+   * Show dialog method
+   */
   _showDialog<T>({required BuildContext context, required Widget child}) {
     showDialog<T>(
       context: context,

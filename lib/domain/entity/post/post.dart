@@ -1,12 +1,12 @@
 class Post {
+  int id;
   int? userId;
-  int? id;
   String? title;
   String? body;
 
   Post({
     this.userId,
-    this.id,
+    this.id = 0,
     this.title,
     this.body,
   });
@@ -24,5 +24,4 @@ class Post {
         "title": title,
         "body": body,
       };
-  
 }

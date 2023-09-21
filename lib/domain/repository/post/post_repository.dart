@@ -6,7 +6,7 @@ import 'package:boilerplate/domain/entity/post/post_list.dart';
 abstract class PostRepository {
   Future<PostList> getPosts();
 
-  Future<List<Post>> findPostById(int id);
+  Future<Post> findPostById(int id);
 
   Future<int> insert(Post post);
 

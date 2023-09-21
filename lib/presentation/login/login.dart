@@ -1,7 +1,9 @@
+import 'dart:developer';
+
 import 'package:another_flushbar/flushbar_helper.dart';
 import 'package:boilerplate/constants/assets.dart';
 import 'package:boilerplate/core/stores/form/form_store.dart';
-import 'package:boilerplate/core/widgets/app_icon_widget.dart';
+// import 'package:boilerplate/core/widgets/app_icon_widget.dart';
 import 'package:boilerplate/core/widgets/empty_app_bar_widget.dart';
 import 'package:boilerplate/core/widgets/progress_indicator_widget.dart';
 import 'package:boilerplate/core/widgets/rounded_button_widget.dart';
@@ -9,6 +11,7 @@ import 'package:boilerplate/core/widgets/textfield_widget.dart';
 import 'package:boilerplate/data/sharedpref/constants/preferences.dart';
 import 'package:boilerplate/presentation/home/store/theme/theme_store.dart';
 import 'package:boilerplate/presentation/login/store/login_store.dart';
+import 'package:boilerplate/presentation/login/widgets/login_forgot_button.dart';
 import 'package:boilerplate/utils/device/device_utils.dart';
 import 'package:boilerplate/utils/locale/app_localization.dart';
 import 'package:boilerplate/utils/routes/routes.dart';
@@ -20,26 +23,29 @@ import '../../di/service_locator.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  //text controllers:-----------------------------------------------------------
-  TextEditingController _userEmailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+class LoginScreenState extends State<LoginScreen> {
+  // Field controllers
+  TextEditingController userEmailController =
+      TextEditingController(text: "toandn96@gmail.com");
+  TextEditingController passwordController =
+      TextEditingController(text: "Dnt@2605");
 
-  //stores:---------------------------------------------------------------------
-  final ThemeStore _themeStore = getIt<ThemeStore>();
-  final FormStore _formStore = getIt<FormStore>();
-  final UserStore _userStore = getIt<UserStore>();
+  // Stores
+  final ThemeStore themeStore = getIt<ThemeStore>();
+  final FormStore formStore = getIt<FormStore>();
+  final UserStore userStore = getIt<UserStore>();
 
-  //focus node:-----------------------------------------------------------------
-  late FocusNode _passwordFocusNode;
+  // Focus node
+  late FocusNode passwordFocusNode;
 
+  // Override initState method
   @override
   void initState() {
     super.initState();
-    _passwordFocusNode = FocusNode();
+    passwordFocusNode = FocusNode();
   }
 
   @override
@@ -47,12 +53,14 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       primary: true,
       appBar: EmptyAppBar(),
-      body: _buildBody(),
+      body: buildBody(),
     );
   }
 
-  // body methods:--------------------------------------------------------------
-  Widget _buildBody() {
+  /**
+  * Body method
+  */
+  Widget buildBody() {
     return Material(
       child: Stack(
         children: <Widget>[
@@ -61,26 +69,26 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: <Widget>[
                     Expanded(
                       flex: 1,
-                      child: _buildLeftSide(),
+                      child: buildLeftSide(),
                     ),
                     Expanded(
                       flex: 1,
-                      child: _buildRightSide(),
+                      child: buildRightSide(),
                     ),
                   ],
                 )
-              : Center(child: _buildRightSide()),
+              : Center(child: buildRightSide()),
           Observer(
             builder: (context) {
-              return _userStore.success
+              return userStore.success
                   ? navigate(context)
-                  : _showErrorMessage(_formStore.errorStore.errorMessage);
+                  : showErrorMessage(formStore.errorStore.errorMessage);
             },
           ),
           Observer(
             builder: (context) {
               return Visibility(
-                visible: _userStore.isLoading,
+                visible: userStore.isLoading,
                 child: CustomProgressIndicatorWidget(),
               );
             },
@@ -90,7 +98,10 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildLeftSide() {
+/**
+ * Left side widget
+ */
+  Widget buildLeftSide() {
     return SizedBox.expand(
       child: Image.asset(
         Assets.carBackground,
@@ -99,7 +110,10 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildRightSide() {
+/**
+ * Main widget
+ */
+  Widget buildRightSide() {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -108,42 +122,56 @@ class _LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            AppIconWidget(image: 'assets/icons/ic_appicon.png'),
-            SizedBox(height: 24.0),
-            _buildUserIdField(),
-            _buildPasswordField(),
-            _buildForgotPasswordButton(),
-            _buildSignInButton()
+            Text(
+              AppLocalizations.of(context).translate('app_name').toUpperCase(),
+              textAlign: TextAlign.center,
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineLarge
+                  ?.copyWith(color: Colors.orangeAccent),
+            ),
+            // AppIconWidget(image: 'assets/icons/ic_appicon.png'),
+            SizedBox(height: 50.0),
+            buildUserIdField(),
+            buildPasswordField(),
+            LoginForgotButton(),
+            buildSignInButton()
           ],
         ),
       ),
     );
   }
 
-  Widget _buildUserIdField() {
+  /**
+   * Build the user name field
+   */
+  Widget buildUserIdField() {
     return Observer(
       builder: (context) {
         return TextFieldWidget(
           hint: AppLocalizations.of(context).translate('login_et_user_email'),
           inputType: TextInputType.emailAddress,
           icon: Icons.person,
-          iconColor: _themeStore.darkMode ? Colors.white70 : Colors.black54,
-          textController: _userEmailController,
+          iconColor: themeStore.darkMode ? Colors.white70 : Colors.black54,
+          textController: userEmailController,
           inputAction: TextInputAction.next,
           autoFocus: false,
           onChanged: (value) {
-            _formStore.setUserId(_userEmailController.text);
+            formStore.setUserId(userEmailController.text);
           },
           onFieldSubmitted: (value) {
-            FocusScope.of(context).requestFocus(_passwordFocusNode);
+            FocusScope.of(context).requestFocus(passwordFocusNode);
           },
-          errorText: _formStore.formErrorStore.userEmail,
+          errorText: formStore.formErrorStore.userEmail,
         );
       },
     );
   }
 
-  Widget _buildPasswordField() {
+  /**
+   * Build the password field
+   */
+  Widget buildPasswordField() {
     return Observer(
       builder: (context) {
         return TextFieldWidget(
@@ -152,57 +180,47 @@ class _LoginScreenState extends State<LoginScreen> {
           isObscure: true,
           padding: EdgeInsets.only(top: 16.0),
           icon: Icons.lock,
-          iconColor: _themeStore.darkMode ? Colors.white70 : Colors.black54,
-          textController: _passwordController,
-          focusNode: _passwordFocusNode,
-          errorText: _formStore.formErrorStore.password,
+          iconColor: themeStore.darkMode ? Colors.white70 : Colors.black54,
+          textController: passwordController,
+          focusNode: passwordFocusNode,
+          errorText: formStore.formErrorStore.password,
           onChanged: (value) {
-            _formStore.setPassword(_passwordController.text);
+            formStore.setPassword(passwordController.text);
           },
         );
       },
     );
   }
 
-  Widget _buildForgotPasswordButton() {
-    return Align(
-      alignment: FractionalOffset.centerRight,
-      child: MaterialButton(
-        padding: EdgeInsets.all(0.0),
-        child: Text(
-          AppLocalizations.of(context).translate('login_btn_forgot_password'),
-          style: Theme.of(context)
-              .textTheme
-              .bodySmall
-              ?.copyWith(color: Colors.orangeAccent),
-        ),
-        onPressed: () {},
-      ),
-    );
-  }
-
-  Widget _buildSignInButton() {
+  /**
+   * Build the SignIn button
+   * 
+   */
+  Widget buildSignInButton() {
     return RoundedButtonWidget(
       buttonText: AppLocalizations.of(context).translate('login_btn_sign_in'),
       buttonColor: Colors.orangeAccent,
       textColor: Colors.white,
       onPressed: () async {
-        if (_formStore.canLogin) {
+        if (formStore.canLogin) {
           DeviceUtils.hideKeyboard(context);
-          _userStore.login(_userEmailController.text, _passwordController.text);
+          userStore.login(userEmailController.text, passwordController.text);
         } else {
-          _showErrorMessage('Please fill in all fields');
+          showErrorMessage('Please fill in all fields');
         }
       },
     );
   }
 
+  /**
+   * Navigate to Home screen
+   */
   Widget navigate(BuildContext context) {
     SharedPreferences.getInstance().then((prefs) {
       prefs.setBool(Preferences.is_logged_in, true);
     });
 
-    Future.delayed(Duration(milliseconds: 0), () {
+    Future.delayed(Duration(milliseconds: 10), () {
       Navigator.of(context).pushNamedAndRemoveUntil(
           Routes.home, (Route<dynamic> route) => false);
     });
@@ -210,8 +228,10 @@ class _LoginScreenState extends State<LoginScreen> {
     return Container();
   }
 
-  // General Methods:-----------------------------------------------------------
-  _showErrorMessage(String message) {
+  /**
+   * General Methods
+   */
+  showErrorMessage(String message) {
     if (message.isNotEmpty) {
       Future.delayed(Duration(milliseconds: 0), () {
         if (message.isNotEmpty) {
@@ -227,13 +247,16 @@ class _LoginScreenState extends State<LoginScreen> {
     return SizedBox.shrink();
   }
 
-  // dispose:-------------------------------------------------------------------
+  /**
+   * Dispose widgets
+   */
   @override
   void dispose() {
     // Clean up the controller when the Widget is removed from the Widget tree
-    _userEmailController.dispose();
-    _passwordController.dispose();
-    _passwordFocusNode.dispose();
+    userEmailController.dispose();
+    passwordController.dispose();
+    passwordFocusNode.dispose();
+
     super.dispose();
   }
 }

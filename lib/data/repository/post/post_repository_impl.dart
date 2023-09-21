@@ -34,19 +34,23 @@ class PostRepositoryImpl extends PostRepository {
   }
 
   @override
-  Future<List<Post>> findPostById(int id) {
+  Future<Post> findPostById(int id) async {
     //creating filter
-    List<Filter> filters = [];
+    // List<Filter> filters = [];
+
+    return await _postApi.getPostById(id).then((Post post) {
+      return post;
+    }).catchError((error) => throw error);
 
     //check to see if dataLogsType is not null
-    Filter dataLogTypeFilter = Filter.equals(DBConstants.FIELD_ID, id);
-    filters.add(dataLogTypeFilter);
+    // Filter dataLogTypeFilter = Filter.equals(DBConstants.FIELD_ID, id);
+    // filters.add(dataLogTypeFilter);
 
-    //making db call
-    return _postDataSource
-        .getAllSortedByFilter(filters: filters)
-        .then((posts) => posts)
-        .catchError((error) => throw error);
+    // //making db call
+    // return _postDataSource
+    //     .getAllSortedByFilter(filters: filters)
+    //     .then((posts) => posts)
+    //     .catchError((error) => throw error);
   }
 
   @override
